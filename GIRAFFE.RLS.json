@@ -1,0 +1,1082 @@
+{
+  "staticCalibs": [
+    "1 GRATING_DATA",
+    "2 SLIT_GEOMETRY_SETUP",
+    "3 LINE_MASK",
+    "4 REFERENCE_STAB",
+    "5 REFERENCE_DISP_SOLUTION",
+    "6 LINE_CATALOG",
+    "7 ATMOSPHERIC_EXTINCTION",
+    "8 FLUX_STANDARDS"
+  ],
+  "rules": [
+    {
+      "rawType": "ACQ",
+      "doClass": "ACQ_FACB",
+      "catg": "ACQUISITION",
+      "groupingRule": "single",
+      "index": 1,
+      "masterCalibs": [],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==ACQUISITION and DPR.TYPE==OBJECT"
+    },
+    {
+      "rawType": "SIMLAMP",
+      "doClass": "SIMLAMP",
+      "catg": "CALIB",
+      "recipe": "none",
+      "index": 2,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==REFERENCE_STAB and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.GRAT.WLEN==INS.GRAT.WLEN and inputFile.DET.READ.SPEED==DET.READ.SPEED and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==SIMLAMP,TAL",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    },
+    {
+      "rawType": "BIAS",
+      "doClass": "BIAS",
+      "catg": "CALIB",
+      "recipe": "gimasterbias",
+      "groupingRule": "TPL_A",
+      "index": 3,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "9 MASTER_BIAS"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==BIAS",
+      "groupBy": "DET.READ.SPEED,TPL.START"
+    },
+    {
+      "rawType": "DARK",
+      "doClass": "DARK",
+      "catg": "CALIB",
+      "recipe": "gimasterdark",
+      "groupingRule": "TPL_A",
+      "index": 4,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "10 MASTER_DARK"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==DARK",
+      "groupBy": "DET.READ.SPEED,TPL.START"
+    },
+    {
+      "rawType": "IFLT",
+      "doClass": "OFF_RAW,ON_RAW",
+      "catg": "CALIB",
+      "recipe": "detmon_opt_lg",
+      "groupingRule": "TPL_I",
+      "index": 5,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "[[DPR.CATG==CALIB and DPR.TYPE==BIAS,DETCHECK and DPR.TECH==IMAGE]] OR [[DPR.CATG==CALIB and DPR.TYPE==LAMP,FLAT,DETCHECK and DPR.TECH==IMAGE]]",
+      "groupBy": "DET.READ.SPEED,TPL.START"
+    },
+    {
+      "rawType": "FFLAT",
+      "doClass": "FIBER_FLAT",
+      "catg": "CALIB",
+      "recipe": "gimasterflat",
+      "groupingRule": "TPL_A",
+      "index": 6,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          "11 FF_EXTERRORS"
+        ],
+        [
+          "12 FF_EXTSPECTRA"
+        ],
+        [
+          "13 FF_LOCCENTROID"
+        ],
+        [
+          "14 FF_LOCWIDTH"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==LAMP,FLAT and (INS.MODE==MED or INS.MODE==IFU or INS.MODE==ARG)",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START"
+    },
+    {
+      "rawType": "NFLT",
+      "doClass": "NASMYTH_FLAT",
+      "catg": "CALIB",
+      "recipe": "gimasterflat",
+      "groupingRule": "TPL_A",
+      "index": 7,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "15 NF_EXTERRORS"
+        ],
+        [
+          "16 NF_EXTSPECTRA"
+        ],
+        [
+          "17 NF_LOCCENTROID"
+        ],
+        [
+          "18 NF_LOCWIDTH"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==LAMP,FLAT,NASMYTH and (INS.MODE==MED or INS.MODE==IFU or INS.MODE==ARG)",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START"
+    },
+    {
+      "rawType": "SFLT",
+      "doClass": "SKY_FLAT",
+      "catg": "CALIB",
+      "recipe": "gimasterflat",
+      "groupingRule": "TPL_A",
+      "index": 8,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "19 SF_EXTERRORS"
+        ],
+        [
+          "20 SF_EXTSPECTRA"
+        ],
+        [
+          "21 SF_LOCCENTROID"
+        ],
+        [
+          "22 SF_LOCWIDTH"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==SKY,OzPoz and (INS.MODE==MED or INS.MODE==IFU or INS.MODE==ARG)",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START"
+    },
+    {
+      "rawType": "WAVE",
+      "doClass": "ARC_SPECTRUM",
+      "catg": "CALIB",
+      "recipe": "giwavecalibration",
+      "index": 9,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==REFERENCE_DISP_SOLUTION and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==LINE_CATALOG and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "23 DISPERSION_SOLUTION"
+        ],
+        [
+          "24 ARC_RBNSPECTRA"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==LAMP,WAVE and (INS.MODE==MED or INS.MODE==IFU or INS.MODE==ARG)",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    },
+    {
+      "rawType": "STD_IFU",
+      "doClass": "STD_IFU",
+      "catg": "CALIB",
+      "recipe": "gistandard",
+      "index": 10,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==ATMOSPHERIC_EXTINCTION and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FLUX_STANDARDS and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,0",
+          "PRO.CATG==MASTER_DARK and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==DISPERSION_SOLUTION and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          "25 STD_RBNSPECTRA"
+        ],
+        [
+          "26 STD_RCSPECTRA"
+        ],
+        [
+          "27 INSTRUMENT_RESPONSE"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and (DPR.TYPE==STD,OzPoz or DPR.TYPE==STD,SimCal) and INS.MODE==IFU",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    },
+    {
+      "rawType": "STD_ARG",
+      "doClass": "STD_ARG",
+      "catg": "CALIB",
+      "recipe": "gistandard",
+      "index": 11,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==ATMOSPHERIC_EXTINCTION and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FLUX_STANDARDS and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==DISPERSION_SOLUTION and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "28 STD_RBNSPECTRA"
+        ],
+        [
+          "29 STD_RCSPECTRA"
+        ],
+        [
+          "30 INSTRUMENT_RESPONSE"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and (DPR.TYPE==STD,OzPoz or DPR.TYPE==STD,SimCal) and INS.MODE==ARG",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    },
+    {
+      "rawType": "SCI_MED",
+      "doClass": "SCI_SIMCAL_MED,SCI_OZPOZ_MED",
+      "catg": "SCIENCE",
+      "recipe": "giscience",
+      "index": 12,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "0,1",
+          "PRO.CATG==LINE_MASK and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,0",
+          "PRO.CATG==MASTER_DARK and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==DISPERSION_SOLUTION and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1 MASSOC",
+          "PRO.CATG==ARC_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "31 SCIENCE_RBNSPECTRA"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "[[DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,SimCal and INS.MODE==MED]] OR [[DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,OzPoz and INS.MODE==MED]]",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    },
+    {
+      "rawType": "SCI_IFU",
+      "doClass": "SCI_SIMCAL_IFU,SCI_OZPOZ_IFU",
+      "catg": "SCIENCE",
+      "recipe": "giscience",
+      "index": 13,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "0,1",
+          "PRO.CATG==LINE_MASK and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,0",
+          "PRO.CATG==MASTER_DARK and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==NF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==NF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==NF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==NF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==DISPERSION_SOLUTION and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1 MASSOC",
+          "PRO.CATG==ARC_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RCSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RCSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "32 SCIENCE_RBNSPECTRA"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "[[DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,SimCal and INS.MODE==IFU]] OR [[DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,OzPoz and INS.MODE==IFU]]",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    },
+    {
+      "rawType": "SCI_ARG",
+      "doClass": "SCI_SIMCAL_ARG,SCI_OZPOZ_ARG",
+      "catg": "SCIENCE",
+      "recipe": "giscience",
+      "index": 14,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==GRATING_DATA and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SLIT_GEOMETRY_SETUP and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "0,1",
+          "PRO.CATG==LINE_MASK and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==ATMOSPHERIC_EXTINCTION and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==FLUX_STANDARDS and inputFile.INSTRUME==INSTRUME and MJD-OBS<inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_BIAS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,0",
+          "PRO.CATG==MASTER_DARK and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==FF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==FF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==FF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==FF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_EXTERRORS and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_EXTSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_LOCCENTROID and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==NF_LOCWIDTH and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==DISPERSION_SOLUTION and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==ARC_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RCSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==INSTRUMENT_RESPONSE and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RBNSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==STD_RCSPECTRA and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==INSTRUMENT_RESPONSE and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "33 SCIENCE_RBNSPECTRA"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "[[DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,SimCal and INS.MODE==ARG]] OR [[DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,OzPoz and INS.MODE==ARG]]",
+      "groupBy": "INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE"
+    }
+  ]
+}

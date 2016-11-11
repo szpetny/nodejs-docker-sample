@@ -1,0 +1,271 @@
+if DPR.CATG=="CALIB" and DPR.TYPE=="DARK" and DPR.TECH=="IMAGE" then 
+{
+   RAW.TYPE = "DARK";
+   DO.CLASS = "DARK";
+   PACK.DIR = "DET";
+   CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="FLAT,LAMP" and DPR.TECH=="SPECTRUM" then 
+{
+   RAW.TYPE = "FLAT_LAMP";
+   DO.CLASS = "FLAT_ON";
+   PACK.DIR = "FLAT";
+   CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="FLAT,OFF" and DPR.TECH=="IMAGE" then 
+{
+   RAW.TYPE = "FLAT_LAMP";
+   DO.CLASS = "FLAT_OFF";
+   PACK.DIR = "FLAT";
+   CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="WAVE,LAMP" and DPR.TECH=="SPECTRUM" then 
+{
+   RAW.TYPE = "WAVE";
+   DO.CLASS = "ARC_ON";
+   PACK.DIR = "WAVE";
+   CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="WAVE,OFF" and DPR.TECH=="IMAGE" then 
+{
+   RAW.TYPE = "WAVE";
+   DO.CLASS = "ARC_OFF";
+   PACK.DIR = "WAVE";
+   CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="FLAT,SKY" and DPR.TECH=="IFU" then 
+{
+   RAW.TYPE = "FLAT_SKY";
+   DO.CLASS = "FLAT_SKY";
+   PACK.DIR = "FLAT";
+   CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="OBJECT,SKY,STD,FLUX" and DPR.TECH=="IFU" then 
+{
+   RAW.TYPE = "STD";
+   DO.CLASS = "STD";
+   PACK.DIR = "STD";
+   CATG = "CALIB";
+}
+if DPR.CATG=="ACQUISITION" and (DPR.TYPE=="OBJECT" or DPR.TYPE=="OBJECT,SKY") and DPR.TECH=="IFU" then 
+{
+ RAW.TYPE = "ACQUISITION";
+ DO.CLASS = "OBJECT";
+ PACK.DIR = "NONE";
+ CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="OBJECT,SKY" and DPR.TECH=="IFU" then 
+{
+ RAW.TYPE = "ASTROMETRY";
+ DO.CLASS = "OBJECT";
+ PACK.DIR = "NONE";
+ CATG = "CALIB";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,SKY" and DPR.TECH=="IFU" then 
+{
+ RAW.TYPE = "SCIENCE";
+ DO.CLASS = "SCIENCE";
+ PACK.DIR = "SCI";
+ CATG = "SCIENCE";
+}
+select execute(ACTION_DARK) from inputFiles where RAW.TYPE=="DARK"
+  group by DET.NDIT,DET.SEQ1.DIT,DET.SEQ2.DIT,DET.SEQ3.DIT,TPL.START as (TPL_A,tpl);
+select execute(ACTION_FLAT_LAMP) from inputFiles where RAW.TYPE=="FLAT_LAMP"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START as (TPL_A,tpl);
+select execute(ACTION_WAVE) from inputFiles where RAW.TYPE=="WAVE"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START as (TPL_A,tpl);
+select execute(ACTION_FLAT_SKY) from inputFiles where RAW.TYPE=="FLAT_SKY"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START as (TPL_A,tpl);
+select execute(ACTION_STD) from inputFiles where RAW.TYPE=="STD"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START as (TPL_A,tpl);
+select execute(ACTION_ACQ) from inputFiles where RAW.TYPE=="ACQUISITION"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START as (TPL_A,tpl);
+select execute(ACTION_ASTROMETRY) from inputFiles where RAW.TYPE=="ASTROMETRY"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,ARCFILE;
+select execute(ACTION_SCIENCE) from inputFiles where RAW.TYPE=="SCIENCE"
+  group by INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START as (TPL_A,tpl);
+action ACTION_DARK
+{
+ recipe kmo_dark;
+ product MASTER_DARK { PRO.CATG="MASTER_DARK"; PRO.EXT="tpl_0000.fits";}
+ product BADPIXEL_DARK { PRO.CATG="BADPIXEL_DARK"; PRO.EXT="tpl_0001.fits";}
+}
+action ACTION_FLAT_LAMP
+{
+ minRet = 1; maxRet = 1;
+ select file as BADPIXEL_DARK from calibFiles where PRO.CATG=="BADPIXEL_DARK" and DET.SEQ1.DIT >= 30.0 and DET.SEQ1.DIT <= 100.0
+  ;
+ recipe kmo_flat
+ {
+  "--suppress_extension=true";
+ }
+ product MASTER_FLAT { PRO.CATG="MASTER_FLAT"; PRO.EXT="tpl_0000.fits";}
+ product BADPIXEL_FLAT { PRO.CATG="BADPIXEL_FLAT"; PRO.EXT="tpl_0001.fits";}
+ product FLAT_EDGE { PRO.CATG="FLAT_EDGE"; PRO.EXT="tpl_0002.fits";}
+ product XCAL { PRO.CATG="XCAL"; PRO.EXT="tpl_0003.fits";}
+ product YCAL { PRO.CATG="YCAL"; PRO.EXT="tpl_0004.fits";}
+}
+action ACTION_WAVE
+{
+ minRet = 1; maxRet = 1;
+ select file as FLAT_EDGE from calibFiles where PRO.CATG=="FLAT_EDGE" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME
+  ;
+ minRet = 1; maxRet = 1;
+ select file as XCAL from calibFiles where PRO.CATG=="XCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME
+  ;
+ minRet = 1; maxRet = 1;
+ select file as YCAL from calibFiles where PRO.CATG=="YCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME
+  ;
+ minRet = 1; maxRet = 1;
+ select file as ARC_LIST from calibFiles where PRO.CATG=="ARC_LIST" and inputFile.INS.GRAT1.ID==INS.GRAT1.ID
+  ;
+ minRet = 1; maxRet = 1;
+ select file as REF_LINES from calibFiles where PRO.CATG=="REF_LINES"
+  ;
+ minRet = 1; maxRet = 1;
+ select file as WAVE_BAND from calibFiles where PRO.CATG=="WAVE_BAND"
+  ;
+ recipe kmo_wave_cal
+ {
+  "--suppress_extension=true";
+ }
+ product LCAL { PRO.CATG="LCAL"; PRO.EXT="tpl_0000.fits";}
+}
+action ACTION_FLAT_SKY
+{
+ minRet = 1; maxRet = 1;
+ select file as MASTER_DARK from calibFiles where PRO.CATG=="MASTER_DARK" and DET.SEQ1.DIT >= 30.0 and DET.SEQ1.DIT <= 100.0
+  ;
+ minRet = 1; maxRet = 1;
+ select file as MASTER_FLAT from calibFiles where PRO.CATG=="MASTER_FLAT" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as XCAL from calibFiles where PRO.CATG=="XCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as YCAL from calibFiles where PRO.CATG=="YCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as LCAL from calibFiles where PRO.CATG=="LCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as FLAT_EDGE from calibFiles where PRO.CATG=="FLAT_EDGE" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as WAVE_BAND from calibFiles where PRO.CATG=="WAVE_BAND"
+  ;
+ recipe kmo_illumination
+ {
+  "--suppress_extension=true";
+ }
+ product ILLUM_CORR { PRO.CATG="ILLUM_CORR"; PRO.EXT="tpl_0000.fits";}
+}
+action ACTION_STD
+{
+ minRet = 1; maxRet = 1;
+ select file as MASTER_FLAT from calibFiles where PRO.CATG=="MASTER_FLAT" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as XCAL from calibFiles where PRO.CATG=="XCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as YCAL from calibFiles where PRO.CATG=="YCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as LCAL from calibFiles where PRO.CATG=="LCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 0; maxRet = 1;
+ select file as ILLUM_CORR from calibFiles where PRO.CATG=="ILLUM_CORR" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME
+  ;
+ minRet = 1; maxRet = 1;
+ select file as ATMOS_MODEL from calibFiles where PRO.CATG=="ATMOS_MODEL" and inputFile.INS.GRAT1.ID==INS.GRAT1.ID
+  ;
+ minRet = 0; maxRet = 1;
+ select file as SOLAR_SPEC from calibFiles where PRO.CATG=="SOLAR_SPEC" and inputFile.INS.GRAT1.ID==INS.GRAT1.ID
+  ;
+ minRet = 1; maxRet = 1;
+ select file as SPEC_TYPE_LOOKUP from calibFiles where PRO.CATG=="SPEC_TYPE_LOOKUP"
+  ;
+ minRet = 1; maxRet = 1;
+ select file as WAVE_BAND from calibFiles where PRO.CATG=="WAVE_BAND"
+  ;
+ recipe kmo_std_star
+ {
+  "--suppress_extension=true";
+ }
+ product TELLURIC { PRO.CATG="TELLURIC"; PRO.EXT="tpl_0000.fits";}
+}
+action ACTION_ACQ
+{
+ minRet = 1; maxRet = 1;
+ select file as XCAL from calibFiles where PRO.CATG=="XCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as YCAL from calibFiles where PRO.CATG=="YCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as LCAL from calibFiles where PRO.CATG=="LCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as WAVE_BAND from calibFiles where PRO.CATG=="WAVE_BAND"
+  ;
+ recipe kmo_reconstruct;
+ product FIT_PROFILE { PRO.CATG="FIT_PROFILE"; PRO.EXT="tpl_0002.fits";}
+}
+action ACTION_ASTROMETRY
+{
+ minRet = 1; maxRet = 1;
+ select file as XCAL from calibFiles where PRO.CATG=="XCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as YCAL from calibFiles where PRO.CATG=="YCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as LCAL from calibFiles where PRO.CATG=="LCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID == "60.A-9254(A)" and MJD-OBS > inputFile.MJD-OBS
+  ;
+ minRet = 1; maxRet = 1;
+ select file as WAVE_BAND from calibFiles where PRO.CATG=="WAVE_BAND"
+  ;
+ recipe kmo_reconstruct;
+ product FIT_PROFILE { PRO.CATG="FIT_PROFILE"; PRO.EXT="tpl_0002.fits";}
+}
+action ACTION_SCIENCE
+{
+ minRet = 1; maxRet = 1;
+ select file as MASTER_FLAT from calibFiles where PRO.CATG=="MASTER_FLAT" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS > inputFile.MJD-OBS and OBS.PROG.ID == "60.A-9254(A)"
+  ;
+ minRet = 1; maxRet = 1;
+ select file as XCAL from calibFiles where PRO.CATG=="XCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS > inputFile.MJD-OBS and OBS.PROG.ID == "60.A-9254(A)"
+  ;
+ minRet = 1; maxRet = 1;
+ select file as YCAL from calibFiles where PRO.CATG=="YCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS > inputFile.MJD-OBS and OBS.PROG.ID == "60.A-9254(A)"
+  ;
+ minRet = 1; maxRet = 1;
+ select file as LCAL from calibFiles where PRO.CATG=="LCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS > inputFile.MJD-OBS and OBS.PROG.ID == "60.A-9254(A)"
+  ;
+ minRet = 0; maxRet = 1;
+ select file as ILLUM_CORR from calibFiles where PRO.CATG=="ILLUM_CORR" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME
+  ;
+ minRet = 1; maxRet = 1;
+ select file as WAVE_BAND from calibFiles where PRO.CATG=="WAVE_BAND"
+  ;
+ minRet = 1; maxRet = 1;
+ select file as MASTER_DARK_MASSOC from calibFiles where PRO.CATG=="MASTER_DARK" and inputFile.DET.SEQ1.DIT==DET.SEQ1.DIT
+  ;
+ minRet = 0; maxRet = 1;
+ select file as MASTER_FLAT_MASSOC from calibFiles where PRO.CATG=="MASTER_FLAT" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS > inputFile.MJD-OBS and OBS.ID==inputFile.OBS.ID
+  ;
+ minRet = 0; maxRet = 1;
+ select file as LCAL_MASSOC from calibFiles where PRO.CATG=="LCAL" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS > inputFile.MJD-OBS and OBS.ID==inputFile.OBS.ID
+  ;
+ minRet = 0; maxRet = 8;
+ select file as TELLURIC_MASSOC from calibFiles where PRO.CATG=="TELLURIC" and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and (inputFile.MJD-OBS - MJD-OBS) < 0.5 and (inputFile.MJD-OBS - MJD-OBS) > -0.5
+  ;
+ minRet = 0; maxRet = 2;
+ select file as ACQ_RASSOC from rawFiles where RAW.TYPE=="ACQUISITION" and inputFile.OBS.ID==OBS.ID
+  ;
+ recipe kmo_sci_red
+ {
+  "--suppress_extension=true";
+ }
+}

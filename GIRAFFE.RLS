@@ -1,0 +1,555 @@
+if DPR.CATG=="ACQUISITION" and DPR.TYPE=="OBJECT" then 
+{
+  RAW.TYPE = "ACQ";
+  DO.CLASS = "ACQ_FACB";
+  CATG = "ACQUISITION";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="SIMLAMP,TAL" then 
+{
+  RAW.TYPE = "SIMLAMP";
+  DO.CLASS = "SIMLAMP";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="BIAS" then 
+{
+  RAW.TYPE = "BIAS";
+  DO.CLASS = "BIAS";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="DARK" then 
+{
+  RAW.TYPE = "DARK";
+  DO.CLASS = "DARK";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="BIAS,DETCHECK" and DPR.TECH=="IMAGE" then 
+{
+  RAW.TYPE = "IFLT";
+  DO.CLASS = "OFF_RAW";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="LAMP,FLAT,DETCHECK" and DPR.TECH=="IMAGE" then 
+{
+  RAW.TYPE = "IFLT";
+  DO.CLASS = "ON_RAW";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="LAMP,FLAT" and (INS.MODE=="MED" or INS.MODE=="IFU" or INS.MODE=="ARG") then 
+{
+  RAW.TYPE = "FFLAT";
+  DO.CLASS = "FIBER_FLAT";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="LAMP,FLAT,NASMYTH" and (INS.MODE=="MED" or INS.MODE=="IFU" or INS.MODE=="ARG") then 
+{
+  RAW.TYPE = "NFLT";
+  DO.CLASS = "NASMYTH_FLAT";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="SKY,OzPoz" and (INS.MODE=="MED" or INS.MODE=="IFU" or INS.MODE=="ARG") then 
+{
+  RAW.TYPE = "SFLT";
+  DO.CLASS = "SKY_FLAT";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and DPR.TYPE=="LAMP,WAVE" and (INS.MODE=="MED" or INS.MODE=="IFU" or INS.MODE=="ARG") then 
+{
+  RAW.TYPE = "WAVE";
+  DO.CLASS = "ARC_SPECTRUM";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and (DPR.TYPE=="STD,OzPoz" or DPR.TYPE=="STD,SimCal") and INS.MODE=="IFU" then 
+{
+  RAW.TYPE = "STD_IFU";
+  DO.CLASS = "STD_IFU";
+  CATG = "CALIB";
+}
+if DPR.CATG=="CALIB" and (DPR.TYPE=="STD,OzPoz" or DPR.TYPE=="STD,SimCal") and INS.MODE=="ARG" then 
+{
+  RAW.TYPE = "STD_ARG";
+  DO.CLASS = "STD_ARG";
+  CATG = "CALIB";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,SimCal" and INS.MODE=="MED" then 
+{
+  RAW.TYPE = "SCI_MED";
+  DO.CLASS = "SCI_SIMCAL_MED";
+  CATG = "SCIENCE";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,OzPoz" and INS.MODE=="MED" then 
+{
+  RAW.TYPE = "SCI_MED";
+  DO.CLASS = "SCI_OZPOZ_MED";
+  CATG = "SCIENCE";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,SimCal" and INS.MODE=="IFU" then 
+{
+  RAW.TYPE = "SCI_IFU";
+  DO.CLASS = "SCI_SIMCAL_IFU";
+  CATG = "SCIENCE";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,OzPoz" and INS.MODE=="IFU" then 
+{
+  RAW.TYPE = "SCI_IFU";
+  DO.CLASS = "SCI_OZPOZ_IFU";
+  CATG = "SCIENCE";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,SimCal" and INS.MODE=="ARG" then 
+{
+  RAW.TYPE = "SCI_ARG";
+  DO.CLASS = "SCI_SIMCAL_ARG";
+  CATG = "SCIENCE";
+}
+if DPR.CATG=="SCIENCE" and DPR.TYPE=="OBJECT,OzPoz" and INS.MODE=="ARG" then 
+{
+  RAW.TYPE = "SCI_ARG";
+  DO.CLASS = "SCI_OZPOZ_ARG";
+  CATG = "SCIENCE";
+}
+select execute(ACTION_BIAS) from inputFiles where RAW.TYPE=="BIAS"
+  group by DET.READ.SPEED,TPL.START as (TPL_A,tpl);
+select execute(ACTION_SIMLAMP) from inputFiles where RAW.TYPE=="SIMLAMP"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+select execute(ACTION_IFLT) from inputFiles where RAW.TYPE=="IFLT"
+   group by DET.READ.SPEED,TPL.START as (TPL_I,tpi);
+select execute(ACTION_DARK) from inputFiles where RAW.TYPE=="DARK"
+  group by DET.READ.SPEED,TPL.START as (TPL_A,tpl);
+select execute(ACTION_FFLAT) from inputFiles where RAW.TYPE=="FFLAT"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START as (TPL_A,tpl);
+select execute(ACTION_HC_FLAT) from inputFiles where RAW.TYPE=="HC_FLAT"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START as (TPL_A,tpl);
+select execute(ACTION_NFLT) from inputFiles where RAW.TYPE=="NFLT"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START as (TPL_A,tpl);
+select execute(ACTION_SFLT) from inputFiles where RAW.TYPE=="SFLT"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,TPL.START as (TPL_A,tpl);
+select execute(ACTION_SCI_ARG) from inputFiles where RAW.TYPE=="SCI_ARG"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+select execute(ACTION_SCI_IFU) from inputFiles where RAW.TYPE=="SCI_IFU"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+select execute(ACTION_SCI_MED) from inputFiles where RAW.TYPE=="SCI_MED"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+select execute(ACTION_WAVE) from inputFiles where RAW.TYPE=="WAVE"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+select execute(ACTION_STD_IFU) from inputFiles where RAW.TYPE=="STD_IFU"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+select execute(ACTION_STD_ARG) from inputFiles where RAW.TYPE=="STD_ARG"
+  group by INS.SLIT.NAME,INS.EXP.MODE,DET.READ.SPEED,ARCFILE;
+action ACTION_BIAS
+{
+  recipe gimasterbias {
+  "--stack-method=median";
+  }
+  product MASTER_BIAS { PRO.CATG="MASTER_BIAS"; PRO.EXT="tpl_0000.fits";}
+}
+action ACTION_IFLT
+{
+  recipe detmon_opt_lg {
+  "--tolerance=0.01";
+  "--kappa=5.0";
+  "--llx1=1550";
+  "--lly1=260";
+  "--urx1=1950";
+  "--ury1=460";
+  "--llx2=1550";
+  "--lly2=3600";
+  "--urx2=1950";
+  "--ury2=3800";
+  "--llx3=80";
+  "--lly3=3600";
+  "--urx3=480";
+  "--ury3=3800";
+  "--llx4=80";
+  "--lly4=180";
+  "--urx4=480";
+  "--ury4=380";
+  "--llx5=950";
+  "--lly5=1940";
+  "--urx5=1050";
+  "--ury5=2040";
+  "--kappa=5.";
+  "--fpn_method=SMOOTH";
+  "--method=MED";
+  "--saturation_limit=60000.";
+  }
+}
+action ACTION_DARK
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  recipe gimasterdark {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--stack-method=median";
+  }
+  product MASTER_DARK { PRO.CATG="MASTER_DARK"; PRO.EXT="tpl_0000.fits";}
+}
+action ACTION_FFLAT
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe gimasterflat {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  }
+  product FF_EXTERRORS { PRO.CATG="FF_EXTERRORS"; PRO.EXT="tpl_0000.fits";}
+  product FF_EXTSPECTRA { PRO.CATG="FF_EXTSPECTRA"; PRO.EXT="tpl_0002.fits";}
+  product FF_LOCCENTROID { PRO.CATG="FF_LOCCENTROID"; PRO.EXT="tpl_0004.fits";}
+  product FF_LOCWIDTH { PRO.CATG="FF_LOCWIDTH"; PRO.EXT="tpl_0006.fits";}
+}
+action ACTION_NFLT
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe gimasterflat {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  }
+  product NF_EXTERRORS { PRO.CATG="NF_EXTERRORS"; PRO.EXT="tpl_0000.fits";}
+  product NF_EXTSPECTRA { PRO.CATG="NF_EXTSPECTRA"; PRO.EXT="tpl_0002.fits";}
+  product NF_LOCCENTROID { PRO.CATG="NF_LOCCENTROID"; PRO.EXT="tpl_0004.fits";}
+  product NF_LOCWIDTH { PRO.CATG="NF_LOCWIDTH"; PRO.EXT="tpl_0006.fits";}
+}
+action ACTION_SFLT
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe gimasterflat {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  }
+  product SF_EXTERRORS { PRO.CATG="SF_EXTERRORS"; PRO.EXT="tpl_0000.fits";}
+  product SF_EXTSPECTRA { PRO.CATG="SF_EXTSPECTRA"; PRO.EXT="tpl_0002.fits";}
+  product SF_LOCCENTROID { PRO.CATG="SF_LOCCENTROID"; PRO.EXT="tpl_0004.fits";}
+  product SF_LOCWIDTH { PRO.CATG="SF_LOCWIDTH"; PRO.EXT="tpl_0006.fits";}
+}
+action ACTION_SCI_ARG
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 0;
+  select file as MASTER_DARK from calibFiles where PRO.CATG=="MASTER_DARK" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_LOCWIDTH from calibFiles where PRO.CATG=="NF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_LOCCENTROID from calibFiles where PRO.CATG=="NF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_EXTSPECTRA from calibFiles where PRO.CATG=="NF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_EXTERRORS from calibFiles where PRO.CATG=="NF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as DISPERSION_SOLUTION from calibFiles where PRO.CATG=="DISPERSION_SOLUTION" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as STD_RBNSPECTRA_MASSOC from calibFiles where PRO.CATG=="STD_RBNSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as STD_RCSPECTRA_MASSOC from calibFiles where PRO.CATG=="STD_RCSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as INSTRUMENT_RESPONSE_MASSOC from calibFiles where PRO.CATG=="INSTRUMENT_RESPONSE" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.INS1.OPTI1.POS==INS1.OPTI1.POS and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as ATMOSPHERIC_EXTINCTION_MASSOC from calibFiles where PRO.CATG=="ATMOSPHERIC_EXTINCTION" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 0; maxRet = 1;
+  select file as FLUX_STANDARDS_MASSOC from calibFiles where PRO.CATG=="FLUX_STANDARDS" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 0; maxRet = 1;
+  select file as LINE_MASK from calibFiles where PRO.CATG=="LINE_MASK" and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 0; maxRet = 1;
+  select file as FF_LOCWIDTH_MASSOC from calibFiles where PRO.CATG=="FF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as FF_LOCCENTROID_MASSOC from calibFiles where PRO.CATG=="FF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as FF_EXTSPECTRA_MASSOC from calibFiles where PRO.CATG=="FF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as FF_EXTERRORS_MASSOC from calibFiles where PRO.CATG=="FF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as ARC_RBNSPECTRA_MASSOC from calibFiles where PRO.CATG=="ARC_RBNSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 5;
+  select file as ACQ_RASSOC from rawFiles where DPR.CATG=="ACQUISITION" and DPR.TYPE=="OBJECT" and inputFile.OBS.ID==OBS.ID and (inputFile.MJD-OBS - MJD-OBS) < 0.5 and (inputFile.MJD-OBS - MJD-OBS) > -0.5
+  ;
+  recipe giscience {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--flat-apply=TRUE ";
+  }
+  product SCIENCE_RBNSPECTRA { PRO.CATG="SCIENCE_RBNSPECTRA"; PRO.EXT="0005.fits";}
+}
+action ACTION_SCI_IFU
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 0;
+  select file as MASTER_DARK from calibFiles where PRO.CATG=="MASTER_DARK" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_LOCWIDTH from calibFiles where PRO.CATG=="FF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_LOCCENTROID from calibFiles where PRO.CATG=="FF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_EXTSPECTRA from calibFiles where PRO.CATG=="FF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_EXTERRORS from calibFiles where PRO.CATG=="FF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as DISPERSION_SOLUTION from calibFiles where PRO.CATG=="DISPERSION_SOLUTION" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as STD_RBNSPECTRA_MASSOC from calibFiles where PRO.CATG=="STD_RBNSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as STD_RCSPECTRA_MASSOC from calibFiles where PRO.CATG=="STD_RCSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as STD_IFU_RASSOC from rawFiles where DPR.CATG=="CALIB" and (DPR.TYPE=="STD,OzPoz" or DPR.TYPE=="STD,SimCal") and INS.MODE=="IFU" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 0; maxRet = 1;
+  select file as LINE_MASK from calibFiles where PRO.CATG=="LINE_MASK" and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 0; maxRet = 1;
+  select file as NF_LOCWIDTH_MASSOC from calibFiles where PRO.CATG=="NF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as NF_LOCCENTROID_MASSOC from calibFiles where PRO.CATG=="NF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as NF_EXTSPECTRA_MASSOC from calibFiles where PRO.CATG=="NF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as NF_EXTERRORS_MASSOC from calibFiles where PRO.CATG=="NF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as ARC_RBNSPECTRA_MASSOC from calibFiles where PRO.CATG=="ARC_RBNSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 5;
+  select file as ACQ_RASSOC from rawFiles where DPR.CATG=="ACQUISITION" and DPR.TYPE=="OBJECT" and inputFile.OBS.ID==OBS.ID and (inputFile.MJD-OBS - MJD-OBS) < 0.5 and (inputFile.MJD-OBS - MJD-OBS) > -0.5
+  ;
+  recipe giscience {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--flat-apply=TRUE ";
+  }
+  product SCIENCE_RBNSPECTRA { PRO.CATG="SCIENCE_RBNSPECTRA"; PRO.EXT="0005.fits";}
+}
+action ACTION_SCI_MED
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 0;
+  select file as MASTER_DARK from calibFiles where PRO.CATG=="MASTER_DARK" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_LOCWIDTH from calibFiles where PRO.CATG=="FF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_LOCCENTROID from calibFiles where PRO.CATG=="FF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_EXTSPECTRA from calibFiles where PRO.CATG=="FF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_EXTERRORS from calibFiles where PRO.CATG=="FF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as DISPERSION_SOLUTION from calibFiles where PRO.CATG=="DISPERSION_SOLUTION" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 0; maxRet = 1;
+  select file as LINE_MASK from calibFiles where PRO.CATG=="LINE_MASK" and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as ARC_RBNSPECTRA_MASSOC from calibFiles where PRO.CATG=="ARC_RBNSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 1;
+  select file as NFLT_RASSOC from rawFiles where DPR.CATG=="CALIB" and DPR.TYPE=="LAMP,FLAT,NASMYTH" and INS.MODE=="MED" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.OBS.ID==OBS.ID and inputFile.DET.READ.SPEED==DET.READ.SPEED and (inputFile.MJD-OBS - MJD-OBS) < 0.5 and (inputFile.MJD-OBS - MJD-OBS) > -0.5
+  ;
+  minRet = 0; maxRet = 5;
+  select file as ACQ_RASSOC from rawFiles where DPR.CATG=="ACQUISITION" and DPR.TYPE=="OBJECT" and inputFile.OBS.ID==OBS.ID and (inputFile.MJD-OBS - MJD-OBS) < 0.5 and (inputFile.MJD-OBS - MJD-OBS) > -0.5
+  ;
+  recipe giscience {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--flat-apply=TRUE ";
+  }
+  product SCIENCE_RBNSPECTRA { PRO.CATG="SCIENCE_RBNSPECTRA"; PRO.EXT="0005.fits";}
+}
+action ACTION_SIMLAMP
+{
+  minRet = 1; maxRet = 1;
+  select file as REFERENCE_STAB from calibFiles where PRO.CATG=="REFERENCE_STAB" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.GRAT.WLEN==INS.GRAT.WLEN and inputFile.DET.READ.SPEED==DET.READ.SPEED and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe none;
+}
+action ACTION_WAVE
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_LOCCENTROID from calibFiles where PRO.CATG=="FF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FF_LOCWIDTH from calibFiles where PRO.CATG=="FF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as REFERENCE_DISP_SOLUTION from calibFiles where PRO.CATG=="REFERENCE_DISP_SOLUTION" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as LINE_CATALOG from calibFiles where PRO.CATG=="LINE_CATALOG" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe giwavecalibration {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--wcal-lswidth=10,10,10	";
+  }
+  product DISPERSION_SOLUTION { PRO.CATG="DISPERSION_SOLUTION"; PRO.EXT="0006.fits";}
+  product ARC_RBNSPECTRA { PRO.CATG="ARC_RBNSPECTRA"; PRO.EXT="0005.fits";}
+}
+action ACTION_STD_IFU
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 0; maxRet = 0;
+  select file as MASTER_DARK from calibFiles where PRO.CATG=="MASTER_DARK" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_LOCWIDTH from calibFiles where PRO.CATG=="NF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_LOCCENTROID from calibFiles where PRO.CATG=="NF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_EXTSPECTRA from calibFiles where PRO.CATG=="NF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_EXTERRORS from calibFiles where PRO.CATG=="NF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as DISPERSION_SOLUTION from calibFiles where PRO.CATG=="DISPERSION_SOLUTION" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as ATMOSPHERIC_EXTINCTION from calibFiles where PRO.CATG=="ATMOSPHERIC_EXTINCTION" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FLUX_STANDARDS from calibFiles where PRO.CATG=="FLUX_STANDARDS" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe gistandard {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--transmission-apply=FALSE";
+  }
+  product STD_RBNSPECTRA { PRO.CATG="STD_RBNSPECTRA"; PRO.EXT="0005.fits";}
+  product STD_RCSPECTRA { PRO.CATG="STD_RCSPECTRA"; PRO.EXT="0008.fits";}
+  product INSTRUMENT_RESPONSE { PRO.CATG="INSTRUMENT_RESPONSE"; PRO.EXT="0011.fits";}
+}
+action ACTION_STD_ARG
+{
+  minRet = 1; maxRet = 1;
+  select file as MASTER_BIAS from calibFiles where PRO.CATG=="MASTER_BIAS" and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_LOCWIDTH from calibFiles where PRO.CATG=="NF_LOCWIDTH" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_LOCCENTROID from calibFiles where PRO.CATG=="NF_LOCCENTROID" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_EXTSPECTRA from calibFiles where PRO.CATG=="NF_EXTSPECTRA" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as NF_EXTERRORS from calibFiles where PRO.CATG=="NF_EXTERRORS" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as DISPERSION_SOLUTION from calibFiles where PRO.CATG=="DISPERSION_SOLUTION" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and inputFile.DET.READ.SPEED==DET.READ.SPEED
+  ;
+  minRet = 1; maxRet = 1;
+  select file as FLUX_STANDARDS from calibFiles where PRO.CATG=="FLUX_STANDARDS" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as ATMOSPHERIC_EXTINCTION from calibFiles where PRO.CATG=="ATMOSPHERIC_EXTINCTION" and inputFile.INSTRUME==INSTRUME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as GRATING_DATA from calibFiles where PRO.CATG=="GRATING_DATA" and inputFile.INS.GRAT.NAME==INS.GRAT.NAME and MJD-OBS < inputFile.MJD-OBS
+  ;
+  minRet = 1; maxRet = 1;
+  select file as SLIT_GEOMETRY_SETUP from calibFiles where PRO.CATG=="SLIT_GEOMETRY_SETUP" and inputFile.INS.SLIT.NAME==INS.SLIT.NAME and inputFile.INS.EXP.MODE==INS.EXP.MODE and MJD-OBS < inputFile.MJD-OBS
+  ;
+  recipe gistandard {
+  "--bsremove-method=PROFILE+CURVE";
+  "--bsremove-yorder=5";
+  "--transmission-apply=FALSE";
+  }
+  product STD_RBNSPECTRA { PRO.CATG="STD_RBNSPECTRA"; PRO.EXT="0005.fits";}
+  product STD_RCSPECTRA { PRO.CATG="STD_RCSPECTRA"; PRO.EXT="0008.fits";}
+  product INSTRUMENT_RESPONSE { PRO.CATG="INSTRUMENT_RESPONSE"; PRO.EXT="0011.fits";}
+}

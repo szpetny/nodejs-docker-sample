@@ -1,0 +1,511 @@
+{
+  "staticCalibs": [
+    "1 ARC_LIST",
+    "2 REF_LINES",
+    "3 WAVE_BAND",
+    "4 ATMOS_MODEL",
+    "5 SOLAR_SPEC",
+    "6 SPEC_TYPE_LOOKUP"
+  ],
+  "rules": [
+    {
+      "rawType": "DARK",
+      "doClass": "DARK",
+      "catg": "CALIB",
+      "recipe": "kmo_dark",
+      "groupingRule": "TPL_A",
+      "index": 1,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "7 MASTER_DARK"
+        ],
+        [
+          "8 BADPIXEL_DARK"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==DARK and DPR.TECH==IMAGE",
+      "groupBy": "DET.NDIT,DET.SEQ1.DIT,DET.SEQ2.DIT,DET.SEQ3.DIT,TPL.START"
+    },
+    {
+      "rawType": "FLAT_LAMP",
+      "doClass": "FLAT_ON,FLAT_OFF",
+      "catg": "CALIB",
+      "recipe": "kmo_flat",
+      "groupingRule": "TPL_A",
+      "index": 2,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==BADPIXEL_DARK and DET.SEQ1.DIT>=30.0 and DET.SEQ1.DIT<=100.0"
+        ],
+        [
+          "9 MASTER_FLAT"
+        ],
+        [
+          "10 BADPIXEL_FLAT"
+        ],
+        [
+          "11 FLAT_EDGE"
+        ],
+        [
+          "12 XCAL"
+        ],
+        [
+          "13 YCAL"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "[[DPR.CATG==CALIB and DPR.TYPE==FLAT,LAMP and DPR.TECH==SPECTRUM]] OR [[DPR.CATG==CALIB and DPR.TYPE==FLAT,OFF and DPR.TECH==IMAGE]]",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START"
+    },
+    {
+      "rawType": "WAVE",
+      "doClass": "ARC_ON,ARC_OFF",
+      "catg": "CALIB",
+      "recipe": "kmo_wave_cal",
+      "groupingRule": "TPL_A",
+      "index": 3,
+      "masterCalibs": [
+        [
+          "1,1",
+          "PRO.CATG==ARC_LIST and inputFile.INS.GRAT1.ID==INS.GRAT1.ID"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==REF_LINES"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==WAVE_BAND"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FLAT_EDGE and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==XCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==YCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME"
+        ],
+        [
+          "14 LCAL"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "[[DPR.CATG==CALIB and DPR.TYPE==WAVE,LAMP and DPR.TECH==SPECTRUM]] OR [[DPR.CATG==CALIB and DPR.TYPE==WAVE,OFF and DPR.TECH==IMAGE]]",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START"
+    },
+    {
+      "rawType": "FLAT_SKY",
+      "doClass": "FLAT_SKY",
+      "catg": "CALIB",
+      "recipe": "kmo_illumination",
+      "groupingRule": "TPL_A",
+      "index": 4,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==WAVE_BAND"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_DARK and DET.SEQ1.DIT>=30.0 and DET.SEQ1.DIT<=100.0"
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_FLAT and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==FLAT_EDGE and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==XCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==YCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==LCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "15 ILLUM_CORR"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==FLAT,SKY and DPR.TECH==IFU",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START"
+    },
+    {
+      "rawType": "STD",
+      "doClass": "STD",
+      "catg": "CALIB",
+      "recipe": "kmo_std_star",
+      "groupingRule": "TPL_A",
+      "index": 5,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==WAVE_BAND"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==ATMOS_MODEL and inputFile.INS.GRAT1.ID==INS.GRAT1.ID"
+        ],
+        [
+          "0,1",
+          "PRO.CATG==SOLAR_SPEC and inputFile.INS.GRAT1.ID==INS.GRAT1.ID"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==SPEC_TYPE_LOOKUP"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==MASTER_FLAT and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==XCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==YCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==LCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "0,1",
+          "PRO.CATG==ILLUM_CORR and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME"
+        ],
+        [
+          "16 TELLURIC"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==OBJECT,SKY,STD,FLUX and DPR.TECH==IFU",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START"
+    },
+    {
+      "rawType": "ACQUISITION",
+      "doClass": "OBJECT",
+      "catg": "CALIB",
+      "recipe": "kmo_reconstruct",
+      "groupingRule": "TPL_A",
+      "index": 6,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==WAVE_BAND"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==XCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==YCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==LCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "17 FIT_PROFILE"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==ACQUISITION and (DPR.TYPE==OBJECT or DPR.TYPE==OBJECT,SKY) and DPR.TECH==IFU",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START"
+    },
+    {
+      "rawType": "ASTROMETRY",
+      "doClass": "OBJECT",
+      "catg": "CALIB",
+      "recipe": "kmo_reconstruct",
+      "index": 7,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==WAVE_BAND"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==XCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==YCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==LCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and OBS.PROG.ID==60.A-9254(A) and MJD-OBS>inputFile.MJD-OBS"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "18 FIT_PROFILE"
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==CALIB and DPR.TYPE==OBJECT,SKY and DPR.TECH==IFU",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,ARCFILE"
+    },
+    {
+      "rawType": "SCIENCE",
+      "doClass": "SCIENCE",
+      "catg": "SCIENCE",
+      "recipe": "kmo_sci_red",
+      "groupingRule": "TPL_A",
+      "index": 8,
+      "masterCalibs": [
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==WAVE_BAND"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1 MASSOC",
+          "PRO.CATG==MASTER_DARK and inputFile.DET.SEQ1.DIT==DET.SEQ1.DIT"
+        ],
+        [
+          ""
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==MASTER_FLAT and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS>inputFile.MJD-OBS and OBS.ID==inputFile.OBS.ID"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ],
+        [
+          "1,1",
+          "PRO.CATG==XCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS>inputFile.MJD-OBS and OBS.PROG.ID==60.A-9254(A)"
+        ],
+        [
+          "1,1",
+          "PRO.CATG==YCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS>inputFile.MJD-OBS and OBS.PROG.ID==60.A-9254(A)"
+        ],
+        [
+          "0,1 MASSOC",
+          "PRO.CATG==LCAL and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and MJD-OBS>inputFile.MJD-OBS and OBS.ID==inputFile.OBS.ID"
+        ],
+        [
+          "0,1",
+          "PRO.CATG==ILLUM_CORR and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME"
+        ],
+        [
+          "0,8 MASSOC",
+          "PRO.CATG==TELLURIC and inputFile.INS.GRAT1.NAME==INS.GRAT1.NAME and inputFile.INS.GRAT2.NAME==INS.GRAT2.NAME and inputFile.INS.GRAT3.NAME==INS.GRAT3.NAME and inputFile.MJD-OBS-MJD-OBS<0.5 and inputFile.MJD-OBS-MJD-OBS>-0.5"
+        ],
+        [
+          ""
+        ],
+        [
+          ""
+        ]
+      ],
+      "comment": "",
+      "ifRuleDef": "DPR.CATG==SCIENCE and DPR.TYPE==OBJECT,SKY and DPR.TECH==IFU",
+      "groupBy": "INS.GRAT1.NAME,INS.GRAT2.NAME,INS.GRAT3.NAME,TPL.START"
+    }
+  ]
+}

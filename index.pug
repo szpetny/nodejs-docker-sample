@@ -1,0 +1,125 @@
+mixin masterCalibOccurance(rulez, rIndex, mcIndex)
+	if rulez[rIndex].masterCalibs[mcIndex].length > 0
+		p(title=rulez[rIndex].masterCalibs[mcIndex][1]) #{rulez[rIndex].masterCalibs[mcIndex][0]}
+	else 
+		p #{rulez[rIndex].masterCalibs[mcIndex][0]}		
+
+- var rulez=JSON.parse(data).rules;
+- var rulezLength = rulez.length;
+- var staticCalibs = JSON.parse(data).staticCalibs;
+doctype 5
+html
+	head
+		title DFOS_OPS calibration cascade
+	body
+		div 
+			table(style="border: solid 1px")
+				//header
+				tr(style="border: solid 1px")
+					th RAW_TYPE
+						each rule in rulez
+							td(style="border: solid 1px")
+								p(title=rule.ifRuleDef) #{rule.rawType}
+
+				tr(style="border: solid 1px")
+					th DO_CLASS
+						each rule in rulez
+							td(style="border: solid 1px") #{rule.doClass}
+
+				tr(style="border: solid 1px")
+					th CATG
+						each rule in rulez
+							td(style="border: solid 1px") #{rule.catg}
+
+				tr(style="border: solid 1px")
+					th Grouping rule
+						each rule in rulez
+							td(style="border: solid 1px") #{rule.groupingRule}
+
+				tr(style="border: solid 1px")
+					th Recipe
+						each rule in rulez
+							td(style="border: solid 1px") #{rule.recipe}
+
+				tr(style="border: solid 1px")
+					th Index
+						each rule in rulez
+							td(style="border: solid 1px") #{rule.index}	
+
+
+				
+				//separator row
+				tr(style="height: 30px;")
+					td
+
+				//static calibs and master calibs
+				tr(style="border: solid 1px")
+					th(colspan="#{rulezLength+1}")
+						h3 Calibration cascade	
+
+				tr(style="border: solid 1px")
+					th Static calibs
+					th(colspan="#{rulezLength}") Master calibs
+					each staticCalib, index in staticCalibs
+						tr(style="border: solid 1px")
+							td(style="border: solid 1px") 
+								p #{staticCalib}
+								- var x = 0; 
+							while x < rulez.length
+								if rulez[x].masterCalibs && rulez[x].masterCalibs[index]
+									td(style="border: solid 1px") 
+										+masterCalibOccurance(rulez, x, index)
+								else 
+									td(style="border: solid 1px")
+								- x++;
+				- var allMasterCalibsLength = rulez[rulez.length-1].masterCalibs.length;
+				- var start = staticCalibs.length;
+				while start < allMasterCalibsLength
+					- var x = 0;
+						tr(style="border: solid 1px")
+							td(style="border: solid 1px")
+							while x < rulez.length
+								if rulez[x].masterCalibs[start]
+									td(style="border: solid 1px") 
+										+masterCalibOccurance(rulez, x, start)
+								else 
+									td(style="border: solid 1px")
+								- x++;
+					- start++;  
+
+
+				//separator row
+				tr(style="height: 30px;")
+					td
+
+				//comments	
+				tr(style="border: solid 1px")
+					th(colspan="#{rulezLength+1}") 
+						h3 Comments
+
+				tr(style="border: solid 1px")
+					- var x = 0
+					while x < rulezLength + 1
+						td(style="border: solid 1px") 
+						- x++;
+		
+
+				//separator row
+				tr(style="height: 30px;")
+					td
+
+				//analysis
+				tr(style="border: solid 1px")
+					th(colspan="#{rulezLength+1}") 
+						h3(style="align: center;") Analysis (technical consistency checks)
+
+				tr(style="border: solid 1px")
+					td(style="border: solid 1px") products* (CALIB only)
+					each rule in rulez
+						td(style="border: solid 1px")
+							p #{rule.products}
+				tr(style="border: solid 1px")
+					td(style="border: solid 1px") mcalibs**
+					each rule in rulez
+						td(style="border: solid 1px")
+							p #{rule.mcalibs}
